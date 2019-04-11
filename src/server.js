@@ -4,9 +4,8 @@ import "dotenv/config";
 import { ApolloServer } from "apollo-server-express";
 import { typeDefs, resolvers } from "./graphql";
 
-const app = express();
-
 require("./config/database");
+const app = express();
 
 const port = process.env.PORT || 4000;
 const server = new ApolloServer({
