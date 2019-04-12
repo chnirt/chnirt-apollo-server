@@ -1,6 +1,6 @@
 const User = require("../models/user");
 
-const resolvers = {
+export default {
   Query: {
     getUsers: async () => await User.find(),
     getUser: async (_, { _id }) => {
@@ -22,7 +22,8 @@ const resolvers = {
           {
             $set: {
               username: user.username,
-              email: user.email
+              email: user.email,
+              password: user.password
             }
           },
           { new: true }
@@ -37,8 +38,15 @@ const resolvers = {
       } catch (e) {
         return e.message;
       }
+    },
+    deleteMany: async () => {
+      try {
+        const rsUser = await User.deleteMany();
+        const rsTodo = await Todo.deleteMany();
+        return rsUser && rsTodo ? true : false;
+      } catch (error) {
+        return e.message;
+      }
     }
   }
 };
-
-module.exports = resolvers;
