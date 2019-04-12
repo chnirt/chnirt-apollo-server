@@ -20,11 +20,7 @@ export default {
         return await User.findOneAndUpdate(
           { _id: _id },
           {
-            $set: {
-              username: user.username,
-              email: user.email,
-              password: user.password
-            }
+            $set: user
           },
           { new: true }
         );
