@@ -1,10 +1,11 @@
 import http from 'http'
 const { ApolloServer, PubSub } = require('apollo-server-express')
 import express from 'express'
+import session from 'express-session'
+import connectRedis from 'connect-redis'
 
 import 'dotenv/config'
 import cors from 'cors'
-const jwt = require('jsonwebtoken')
 
 // const { ApolloEngine } = require('apollo-engine');
 const { MemcachedCache } = require('apollo-server-cache-memcached')
@@ -14,8 +15,7 @@ import resolvers from './resolvers'
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware'
 
 const PORT = process.env.PORT || 5000
-const ENV = process.env.NODE_ENV || 'production'
-const In_PROD = ENV === 'production'
+const IN_PROD = (process.env.NODE_ENV || 'production') === 'production'
 const path = '/graphql'
 const voyagerPath = '/voyager'
 
@@ -26,6 +26,29 @@ require('./config/database')
 
 // Middleware
 app.disable('x-powered-by')
+
+const RedisStore = connectRedis(session)
+
+// const store = new RedisStore({
+// 	host: process.env.REDIS_HOST,
+// 	port: process.env.REDIS_PORT,
+// 	pass: process.env.REDIS_PASSWORD
+// })
+
+app.use(
+	session({
+		// store,
+		name: process.env.SESS_NAME,
+		secret: process.env.SESS_SECRET,
+		resave: false,
+		saveUninitialized: false,
+		cookie: {
+			maxAge: 7200000,
+			sameSite: true,
+			secure: IN_PROD
+		}
+	})
+)
 app.use(cors())
 app.use(voyagerPath, voyagerMiddleware({ endpointUrl: path }))
 
@@ -50,7 +73,7 @@ const server = new ApolloServer({
 		)
 	},
 	introspection: true,
-	playground: !In_PROD && {
+	playground: !IN_PROD && {
 		settings: {
 			'editor.cursorShape': 'line', // possible values: 'line', 'block', 'underline'
 			'editor.fontFamily': `'Source Code Pro', 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace`,

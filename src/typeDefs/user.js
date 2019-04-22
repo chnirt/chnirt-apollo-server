@@ -10,6 +10,7 @@ export default gql`
 		_id: ID!
 		email: String!
 		password: String!
+		username: String!
 		firstLetterOfEmail: String!
 		createdAt: String!
 		updatedAt: String!
@@ -17,8 +18,9 @@ export default gql`
 	input UserInput {
 		email: String!
 		password: String!
+		username: String!
 	}
-	input EditUserInput {
+	input LoginUserInput {
 		email: String!
 		password: String!
 	}
@@ -29,7 +31,7 @@ export default gql`
 	}
 
 	extend type Mutation {
-		login(userInput: UserInput!): AuthData
+		login(userInput: LoginUserInput!): AuthData
 		register(userInput: UserInput!): User
 		deleteMany: Boolean
 	}

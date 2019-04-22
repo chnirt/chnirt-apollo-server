@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
+import { User } from '../models'
 import { UserInputError } from 'apollo-server-express'
-
-const jwt = require('jsonwebtoken')
-
-const User = require('../models/user')
-const Event = require('../models/event')
+import { signUp, signIn } from '../schemas'
+import Joi from 'joi'
+import Auth from '../auth/auth'
+import jwt from 'jsonwebtoken'
 
 export default {
 	Subscription: {
@@ -13,9 +13,11 @@ export default {
 		}
 	},
 	Query: {
-		me: async (parent, args, context) => {
-			if (!context.user || !context.user.roles.includes('admin')) return null
-			return await context.user
+		me: async (parent, args, { req }) => {
+			// TODO: projection
+			Auth.checkSignedIn(req)
+
+			return await User.findById(req.session.userId)
 		},
 		users: async (parent, args, context, info) => {
 			// TODO: auth, projection, pagination
@@ -32,20 +34,32 @@ export default {
 		}
 	},
 	Mutation: {
-		login: async (parent, { userInput }, info) => {
+		login: async (parent, { userInput }, { req }, info) => {
+			// TODO: check session
+			// const { userId } = req.session.userId
+
+			// if (userId) {
+			// 	return await User.findById(req.session.userId)
+			// }
+
+			await Joi.validate(userInput, signIn, { abortEarly: false })
+
 			const { email, password } = userInput
-			const user = await User.findOne({ email: email })
-			if (!user) {
-				const error = new Error('No user with that email')
-				error.status = 409
-				throw error
-			}
-			const isMatch = await user.isValidPassword(password)
-			if (!isMatch) {
-				const error = new Error('Unauthorized')
-				error.status = 401
-				throw error
-			}
+
+			const user = await Auth.attemptSignIn(email, password)
+
+			// if (!user) {
+			// 	const error = new Error('No user with that email')
+			// 	error.status = 409
+			// 	throw error
+			// }
+
+			// const isMatch = await user.matchesPassword(password)
+			// if (!isMatch) {
+			// 	const error = new Error('Unauthorized')
+			// 	error.status = 401
+			// 	throw error
+			// }
 			const token = await jwt.sign(
 				{
 					iss: 'Chnirt',
@@ -63,14 +77,8 @@ export default {
 			}
 		},
 		register: async (parent, { userInput }, { pubsub }, info) => {
-			const { email, password } = userInput
-			const user = await User.findOne({ email: email })
-			if (user) {
-				// Throw error when account existed
-				const error = new Error('Email exists already.')
-				error.status = 409
-				throw error
-			}
+			// TODO: auth, validation
+			await Joi.validate(userInput, signUp, { abortEarly: false })
 			const newUser = await User.create(userInput)
 			pubsub.publish('newUser', {
 				newUser: newUser
@@ -78,12 +86,9 @@ export default {
 			return newUser
 		},
 		deleteMany: async () => {
-			try {
-				const rsUser = await User.deleteMany()
-				return rsUser ? true : false
-			} catch (error) {
-				return e.message
-			}
+			// TODO: delete
+			const rsUser = await User.deleteMany()
+			return rsUser ? true : false
 		}
 	},
 	User: {

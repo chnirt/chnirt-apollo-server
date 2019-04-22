@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server-express';
+import { gql } from 'apollo-server-express'
 
 export default gql`
 	type Event {
@@ -21,4 +21,4 @@ export default gql`
 	extend type Mutation {
 		createEvent(eventInput: EventInput): Event
 	}
-`;
+`

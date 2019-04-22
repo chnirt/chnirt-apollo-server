@@ -15,16 +15,14 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			required: true
 		},
+		username: {
+			type: String,
+			required: true
+		},
 		createdEvents: [
 			{
 				type: mongoose.Schema.Types.ObjectId,
 				ref: 'Event'
-			}
-		],
-		todos: [
-			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Todo'
 			}
 		]
 	},
@@ -33,7 +31,7 @@ const userSchema = new mongoose.Schema(
 	}
 )
 
-userSchema.static.doestntExist = async function(options) {
+userSchema.statics.doestntExist = async function(options) {
 	return (await this.where(options).countDocuments()) === 0
 }
 
@@ -62,7 +60,7 @@ userSchema.pre('findOneAndUpdate', async function(next) {
 	}
 })
 
-userSchema.methods.isValidPassword = async function(newPassword) {
+userSchema.methods.matchesPassword = async function(newPassword) {
 	try {
 		const user = this
 		return await bcrypt.compare(newPassword, user.password)
@@ -71,4 +69,6 @@ userSchema.methods.isValidPassword = async function(newPassword) {
 	}
 }
 
-module.exports = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema)
+
+export default User
