@@ -1,5 +1,4 @@
-import User from './user';
-import Todo from './todo';
-import Event from './event';
+import User from './user'
+import Event from './event'
 
-module.exports = { User, Todo, Event };
+module.exports = { User, Event }

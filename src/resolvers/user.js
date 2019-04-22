@@ -1,6 +1,10 @@
-const User = require('../models/user');
-const Todo = require('../models/todo');
-const Event = require('../models/event');
+import mongoose from 'mongoose'
+import { UserInputError } from 'apollo-server-express'
+
+const jwt = require('jsonwebtoken')
+
+const User = require('../models/user')
+const Event = require('../models/event')
 
 export default {
 	Subscription: {
@@ -8,69 +12,81 @@ export default {
 			subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('newUser')
 		}
 	},
-	User: {
-		firstLetterOfEmail: parent => {
-			console.log(parent);
-			return parent.email[0];
-		}
-	},
 	Query: {
-		getUsers: async () => await User.find(),
-		getUser: async (_, { _id }) => {
-			return await User.findOne({ _id: _id });
+		me: async (parent, args, context) => {
+			if (!context.user || !context.user.roles.includes('admin')) return null
+			return await context.user
+		},
+		users: async (parent, args, context, info) => {
+			// TODO: auth, projection, pagination
+			return await User.find()
+		},
+		user: async (parent, { _id }, context, info) => {
+			// TODO: auth, projection, sanitization
+			if (!mongoose.Types.ObjectId.isValid(_id)) {
+				throw new UserInputError(`${_id} is not a valid user ID.`)
+			}
+			return await User.findById({
+				_id
+			})
 		}
 	},
 	Mutation: {
-		login: async (parent, { userInput }, { pubsub }) => {
-			try {
-				//checkPassword
-				//awaitcheckPassword(password);
-				const { email, password } = userInput;
-				pubsub.publish('newUser', {
-					newUser: userInput
-				});
-				return await userInput;
-			} catch (error) {
-				return error.message;
+		login: async (parent, { userInput }, info) => {
+			const { email, password } = userInput
+			const user = await User.findOne({ email: email })
+			if (!user) {
+				const error = new Error('No user with that email')
+				error.status = 409
+				throw error
+			}
+			const isMatch = await user.isValidPassword(password)
+			if (!isMatch) {
+				const error = new Error('Unauthorized')
+				error.status = 401
+				throw error
+			}
+			const token = await jwt.sign(
+				{
+					iss: 'Chnirt',
+					sub: user._id
+				},
+				process.env.SECRET_KEY,
+				{
+					expiresIn: '30d'
+				}
+			)
+			return {
+				userId: user._id,
+				token: token,
+				tokenExpiration: '30d'
 			}
 		},
-		createUser: async (_, { userInput }) => {
-			try {
-				console.log(userInput);
-				return await User.create(userInput);
-			} catch (e) {
-				return e.message;
+		register: async (parent, { userInput }, { pubsub }, info) => {
+			const { email, password } = userInput
+			const user = await User.findOne({ email: email })
+			if (user) {
+				// Throw error when account existed
+				const error = new Error('Email exists already.')
+				error.status = 409
+				throw error
 			}
-		},
-		editUser: async (_, { _id, user }) => {
-			try {
-				return await User.updateOne(
-					{ _id: _id },
-					{
-						$set: user
-					},
-					{ new: true }
-				);
-			} catch (error) {
-				return e.message;
-			}
-		},
-		deleteUser: async (_, { _id }) => {
-			try {
-				return (await User.deleteOne({ _id })) ? _id : null;
-			} catch (e) {
-				return e.message;
-			}
+			const newUser = await User.create(userInput)
+			pubsub.publish('newUser', {
+				newUser: newUser
+			})
+			return newUser
 		},
 		deleteMany: async () => {
 			try {
-				const rsUser = await User.deleteMany();
-				const rsTodo = await Todo.deleteMany();
-				const rsEvent = await Event.deleteMany();
-				return rsUser && rsTodo ? true : false;
+				const rsUser = await User.deleteMany()
+				return rsUser ? true : false
 			} catch (error) {
-				return e.message;
+				return e.message
 			}
 		}
+	},
+	User: {
+		firstLetterOfEmail: parent => parent.email[0]
 	}
-};
+}

@@ -1,10 +1,18 @@
-import { gql } from 'apollo-server-express';
+import { gql } from 'apollo-server-express'
 
 export default gql`
+	type AuthData {
+		userId: ID!
+		token: String!
+		tokenExpiration: String!
+	}
 	type User {
 		_id: ID!
 		email: String!
+		password: String!
 		firstLetterOfEmail: String!
+		createdAt: String!
+		updatedAt: String!
 	}
 	input UserInput {
 		email: String!
@@ -15,19 +23,18 @@ export default gql`
 		password: String!
 	}
 	extend type Query {
-		getUsers: [User]
-		getUser(_id: ID!): User
+		me: User
+		users: [User]
+		user(_id: ID!): User
 	}
 
 	extend type Mutation {
-		login(userInput: UserInput!): User
-		createUser(userInput: UserInput): User
-		editUser(_id: ID!, user: EditUserInput): User
-		deleteUser(_id: ID!): ID
+		login(userInput: UserInput!): AuthData
+		register(userInput: UserInput!): User
 		deleteMany: Boolean
 	}
 
 	extend type Subscription {
 		newUser: User!
 	}
-`;
+`

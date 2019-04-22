@@ -1,38 +1,47 @@
-import http from 'http';
-import express from 'express';
-import 'dotenv/config';
-import cors from 'cors';
+import http from 'http'
+const { ApolloServer, PubSub } = require('apollo-server-express')
+import express from 'express'
+
+import 'dotenv/config'
+import cors from 'cors'
+const jwt = require('jsonwebtoken')
 
 // const { ApolloEngine } = require('apollo-engine');
-const { ApolloServer, PubSub } = require('apollo-server-express');
-const { MemcachedCache } = require('apollo-server-cache-memcached');
-import typeDefs from './schema';
-import resolvers from './resolvers';
+const { MemcachedCache } = require('apollo-server-cache-memcached')
+import typeDefs from './typeDefs'
+import resolvers from './resolvers'
 
-import { express as voyagerMiddleware } from 'graphql-voyager/middleware';
+import { express as voyagerMiddleware } from 'graphql-voyager/middleware'
 
-const PORT = process.env.PORT || 7000;
-const path = '/graphql';
-const voyagerPath = '/voyager';
+const PORT = process.env.PORT || 5000
+const ENV = process.env.NODE_ENV || 'production'
+const In_PROD = ENV === 'production'
+const path = '/graphql'
+const voyagerPath = '/voyager'
 
-const app = express();
+const app = express()
 
 // Connect Database
-require('./config/database');
+require('./config/database')
 
-//Middleware
-app.use(cors());
-app.use(voyagerPath, voyagerMiddleware({ endpointUrl: path }));
+// Middleware
+app.disable('x-powered-by')
+app.use(cors())
+app.use(voyagerPath, voyagerMiddleware({ endpointUrl: path }))
 
-const pubsub = new PubSub();
+const pubsub = new PubSub()
 
 const server = new ApolloServer({
 	// These will be defined for both new or existing servers
 	typeDefs,
 	resolvers,
-	context: ({ req, res }) => ({ req, res, pubsub }),
+	context: ({ req, res }) => {
+		return { req, res, pubsub }
+	},
 	subscriptions: {
-		onConnect: () => console.log('Connected to websocket')
+		onConnect: (connectionParams, webSocket, context) => {
+			console.log('🔗 Connected to websocket')
+		}
 	},
 	persistedQueries: {
 		cache: new MemcachedCache(
@@ -41,7 +50,7 @@ const server = new ApolloServer({
 		)
 	},
 	introspection: true,
-	playground: {
+	playground: !In_PROD && {
 		settings: {
 			'editor.cursorShape': 'line', // possible values: 'line', 'block', 'underline'
 			'editor.fontFamily': `'Source Code Pro', 'Consolas', 'Inconsolata', 'Droid Sans Mono', 'Monaco', monospace`,
@@ -67,12 +76,12 @@ const server = new ApolloServer({
 		// ]
 	},
 	tracing: true,
-	cacheControl: true,
+	cacheControl: false,
 	// We set `engine` to false, so that the new agent is not used.
 	engine: false,
 	/* Add this line to disable upload support! */
 	uploads: false
-});
+})
 
 // const engine = new ApolloEngine({
 // 	apiKey: process.env.ENGINE_API_KEY
@@ -81,21 +90,17 @@ const server = new ApolloServer({
 //Mount a jwt or other authentication middleware that is run before the GraphQL execution
 // app.use(path, jwtCheck);
 
-server.applyMiddleware({ app, path }); // app is from an existing express app
+server.applyMiddleware({ app, path }) // app is from an existing express app
 
-const httpServer = http.createServer(app);
-server.installSubscriptionHandlers(httpServer);
+const httpServer = http.createServer(app)
+server.installSubscriptionHandlers(httpServer)
 
 httpServer.listen(PORT, () => {
+	console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`)
 	console.log(
-		`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`
-	);
-	console.log(
-		`🚀 Subscriptions ready at ws://localhost:${PORT}${
-			server.subscriptionsPath
-		}`
-	);
-});
+		`🚀 Subscriptions ready at ws://localhost:${PORT}${server.subscriptionsPath}`
+	)
+})
 
 // engine.listen(
 // 	{
