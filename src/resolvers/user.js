@@ -3,7 +3,7 @@ import { User } from '../models'
 import { UserInputError } from 'apollo-server-express'
 import { signUp, signIn } from '../schemas'
 import Joi from 'joi'
-import Auth from '../auth/auth'
+import * as Auth from '../auth/auth'
 import jwt from 'jsonwebtoken'
 
 export default {
@@ -15,16 +15,23 @@ export default {
 	Query: {
 		me: async (parent, args, { req }) => {
 			// TODO: projection
+
 			Auth.checkSignedIn(req)
 
 			return await User.findById(req.session.userId)
 		},
-		users: async (parent, args, context, info) => {
+		users: async (parent, args, { req }, info) => {
 			// TODO: auth, projection, pagination
+
+			Auth.checkSignedIn(req)
+
 			return await User.find()
 		},
-		user: async (parent, { _id }, context, info) => {
+		user: async (parent, { _id }, { req }, info) => {
 			// TODO: auth, projection, sanitization
+
+			Auth.checkSignedIn(req)
+
 			if (!mongoose.Types.ObjectId.isValid(_id)) {
 				throw new UserInputError(`${_id} is not a valid user ID.`)
 			}
@@ -34,13 +41,31 @@ export default {
 		}
 	},
 	Mutation: {
+		register: async (parent, { userInput }, { req, pubsub }, info) => {
+			// TODO: not auth, validation
+
+			Auth.checkSignedOut(req)
+
+			await Joi.validate(userInput, signUp, { abortEarly: false })
+
+			const user = await User.create(userInput)
+
+			req.session.userId = user._id
+
+			pubsub.publish('newUser', {
+				newUser: user
+			})
+
+			return user
+		},
 		login: async (parent, { userInput }, { req }, info) => {
 			// TODO: check session
-			// const { userId } = req.session.userId
+			const { userId } = req.session
+			console.log(userId)
 
-			// if (userId) {
-			// 	return await User.findById(req.session.userId)
-			// }
+			if (userId) {
+				return await User.findById(userId)
+			}
 
 			await Joi.validate(userInput, signIn, { abortEarly: false })
 
@@ -48,18 +73,8 @@ export default {
 
 			const user = await Auth.attemptSignIn(email, password)
 
-			// if (!user) {
-			// 	const error = new Error('No user with that email')
-			// 	error.status = 409
-			// 	throw error
-			// }
+			req.session.userId = user._id
 
-			// const isMatch = await user.matchesPassword(password)
-			// if (!isMatch) {
-			// 	const error = new Error('Unauthorized')
-			// 	error.status = 401
-			// 	throw error
-			// }
 			const token = await jwt.sign(
 				{
 					iss: 'Chnirt',
@@ -70,20 +85,17 @@ export default {
 					expiresIn: '30d'
 				}
 			)
+
 			return {
 				userId: user._id,
 				token: token,
 				tokenExpiration: '30d'
 			}
 		},
-		register: async (parent, { userInput }, { pubsub }, info) => {
-			// TODO: auth, validation
-			await Joi.validate(userInput, signUp, { abortEarly: false })
-			const newUser = await User.create(userInput)
-			pubsub.publish('newUser', {
-				newUser: newUser
-			})
-			return newUser
+		logout: async (parent, args, { req, res }, info) => {
+			Auth.checkSignedIn(req)
+
+			return Auth.signOut(req, res)
 		},
 		deleteMany: async () => {
 			// TODO: delete

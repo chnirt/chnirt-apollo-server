@@ -1,14 +1,13 @@
 import http from 'http'
-const { ApolloServer, PubSub } = require('apollo-server-express')
+import { ApolloServer, PubSub } from 'apollo-server-express'
 import express from 'express'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
 
 import 'dotenv/config'
-import cors from 'cors'
 
 // const { ApolloEngine } = require('apollo-engine');
-const { MemcachedCache } = require('apollo-server-cache-memcached')
+import { MemcachedCache } from 'apollo-server-cache-memcached'
 import typeDefs from './typeDefs'
 import resolvers from './resolvers'
 
@@ -49,7 +48,6 @@ app.use(
 		}
 	})
 )
-app.use(cors())
 app.use(voyagerPath, voyagerMiddleware({ endpointUrl: path }))
 
 const pubsub = new PubSub()
@@ -73,6 +71,7 @@ const server = new ApolloServer({
 		)
 	},
 	introspection: true,
+	cors: false,
 	playground: !IN_PROD && {
 		settings: {
 			'editor.cursorShape': 'line', // possible values: 'line', 'block', 'underline'

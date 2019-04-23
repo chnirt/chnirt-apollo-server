@@ -33,6 +33,7 @@ export default gql`
 	extend type Mutation {
 		login(userInput: LoginUserInput!): AuthData
 		register(userInput: UserInput!): User
+		logout: Boolean
 		deleteMany: Boolean
 	}
 

@@ -60,13 +60,8 @@ userSchema.pre('findOneAndUpdate', async function(next) {
 	}
 })
 
-userSchema.methods.matchesPassword = async function(newPassword) {
-	try {
-		const user = this
-		return await bcrypt.compare(newPassword, user.password)
-	} catch (error) {
-		throw new Error(error)
-	}
+userSchema.methods.matchesPassword = async function(password) {
+	return await bcrypt.compare(password, this.password)
 }
 
 const User = mongoose.model('User', userSchema)
