@@ -3,7 +3,6 @@ import { User } from '../models'
 import { UserInputError } from 'apollo-server-express'
 import { signUp, signIn } from '../schemas'
 import Joi from 'joi'
-import * as Auth from '../auth/auth'
 import { attemptSignIn, signOut } from '../auth/auth'
 import jwt from 'jsonwebtoken'
 
