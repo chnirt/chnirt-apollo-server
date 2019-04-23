@@ -5,11 +5,7 @@ export const attemptSignIn = async (email, password) => {
 	const message = 'Incorrect email or password. Please try again.'
 	const user = await User.findOne({ email })
 
-	if (!user) {
-		throw new AuthenticationError(message)
-	}
-
-	if (!(await user.matchesPassword(password))) {
+	if (!user || !(await user.matchesPassword(password))) {
 		throw new AuthenticationError(message)
 	}
 
@@ -18,13 +14,13 @@ export const attemptSignIn = async (email, password) => {
 
 const signedIn = req => req.session.userId
 
-export const checkSignedIn = req => {
+export const ensureSignedIn = req => {
 	if (!signedIn(req)) {
 		throw new AuthenticationError('You must be log in.')
 	}
 }
 
-export const checkSignedOut = req => {
+export const ensureSignedOut = req => {
 	if (signedIn(req)) {
 		throw new AuthenticationError('You are already signed in.')
 	}

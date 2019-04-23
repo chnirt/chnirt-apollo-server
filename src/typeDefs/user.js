@@ -25,15 +25,15 @@ export default gql`
 		password: String!
 	}
 	extend type Query {
-		me: User
-		users: [User]
-		user(_id: ID!): User
+		me: User @auth
+		users: [User] @auth
+		user(_id: ID!): User @auth
 	}
 
 	extend type Mutation {
-		login(userInput: LoginUserInput!): AuthData
-		register(userInput: UserInput!): User
-		logout: Boolean
+		register(userInput: UserInput!): User @guest
+		login(userInput: LoginUserInput!): AuthData @guest
+		logout: Boolean @auth
 		deleteMany: Boolean
 	}
 

@@ -10,6 +10,7 @@ import 'dotenv/config'
 import { MemcachedCache } from 'apollo-server-cache-memcached'
 import typeDefs from './typeDefs'
 import resolvers from './resolvers'
+import schemaDirectives from './directives'
 
 import { express as voyagerMiddleware } from 'graphql-voyager/middleware'
 
@@ -56,6 +57,7 @@ const server = new ApolloServer({
 	// These will be defined for both new or existing servers
 	typeDefs,
 	resolvers,
+	schemaDirectives,
 	context: ({ req, res }) => {
 		return { req, res, pubsub }
 	},
@@ -71,7 +73,6 @@ const server = new ApolloServer({
 		)
 	},
 	introspection: true,
-	cors: false,
 	playground: !IN_PROD && {
 		settings: {
 			'editor.cursorShape': 'line', // possible values: 'line', 'block', 'underline'
@@ -112,7 +113,7 @@ const server = new ApolloServer({
 //Mount a jwt or other authentication middleware that is run before the GraphQL execution
 // app.use(path, jwtCheck);
 
-server.applyMiddleware({ app, path }) // app is from an existing express app
+server.applyMiddleware({ app, path, cors: false }) // app is from an existing express app
 
 const httpServer = http.createServer(app)
 server.installSubscriptionHandlers(httpServer)
