@@ -40,10 +40,11 @@ app.use(
 		store,
 		name: process.env.SESS_NAME,
 		secret: process.env.SESS_SECRET,
-		resave: false,
+		resave: true,
+		rolling: true,
 		saveUninitialized: false,
 		cookie: {
-			maxAge: 7200000,
+			maxAge: parseInt(process.env.SESS_LIFETIME),
 			sameSite: true,
 			secure: IN_PROD
 		}
@@ -58,9 +59,7 @@ const server = new ApolloServer({
 	typeDefs,
 	resolvers,
 	schemaDirectives,
-	context: ({ req, res }) => {
-		return { req, res, pubsub }
-	},
+	context: ({ req, res }) => ({ req, res, pubsub }),
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
 			console.log('🔗 Connected to websocket')
@@ -113,7 +112,11 @@ const server = new ApolloServer({
 //Mount a jwt or other authentication middleware that is run before the GraphQL execution
 // app.use(path, jwtCheck);
 
-server.applyMiddleware({ app, path, cors: false }) // app is from an existing express app
+server.applyMiddleware({
+	app,
+	path,
+	cors: { credentials: true, origin: 'http://localhost:3000' }
+}) // app is from an existing express app
 
 const httpServer = http.createServer(app)
 server.installSubscriptionHandlers(httpServer)
