@@ -19,10 +19,10 @@ const IN_PROD = (process.env.NODE_ENV || 'production') === 'production'
 const path = '/graphql'
 const voyagerPath = '/voyager'
 
-const app = express()
-
 // Connect Database
 require('./config/database')
+
+const app = express()
 
 // Middleware
 app.disable('x-powered-by')
