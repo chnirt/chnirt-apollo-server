@@ -28,15 +28,15 @@ app.disable('x-powered-by')
 
 const RedisStore = connectRedis(session)
 
-// const store = new RedisStore({
-// 	host: process.env.REDIS_HOST,
-// 	port: process.env.REDIS_PORT,
-// 	pass: process.env.REDIS_PASSWORD
-// })
+const store = new RedisStore({
+	host: process.env.REDIS_HOST,
+	port: process.env.REDIS_PORT,
+	pass: process.env.REDIS_PASSWORD
+})
 
 app.use(
 	session({
-		// store,
+		store,
 		name: process.env.SESS_NAME,
 		secret: process.env.SESS_SECRET,
 		resave: false,
@@ -83,7 +83,7 @@ const server = new ApolloServer({
 			'prettier.printWidth': 80,
 			'prettier.tabWidth': 2,
 			'prettier.useTabs': true,
-			'request.credentials': 'omit', // possible values: 'omit', 'include', 'same-origin'
+			'request.credentials': 'include', // possible values: 'omit', 'include', 'same-origin'
 			'schema.polling.enable': true, // enables automatic schema polling
 			'schema.polling.endpointFilter': '*localhost*', // endpoint filter for schema polling
 			'schema.polling.interval': 2000, // schema polling interval in ms

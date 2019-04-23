@@ -49,6 +49,7 @@ export default {
 			await Joi.validate(userInput, signUp, { abortEarly: false })
 
 			const user = await User.create(userInput)
+			console.log(user._id)
 
 			req.session.userId = user._id
 
@@ -61,7 +62,6 @@ export default {
 		login: async (parent, { userInput }, { req }, info) => {
 			// TODO: check session
 			const { userId } = req.session
-			console.log(userId)
 
 			if (userId) {
 				return await User.findById(userId)
