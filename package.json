@@ -9,7 +9,7 @@
 		"build": "babel src --out-dir dist",
 		"serve": "node dist/server.js",
 		"pm2": "NODE_ENV='development' PORT=7000 pm2 start src/server.js --interpreter babel-node",
-		"heroku-postbuild": "yarn && yarn build && yarn serve"
+		"heroku-postbuild": "yarn start"
 	},
 	"dependencies": {
 		"apollo-engine": "^1.1.2",
