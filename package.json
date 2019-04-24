@@ -11,8 +11,7 @@
 		"dev": "NODE_ENV='development' PORT=7000 yarn start",
 		"build": "babel src --out-dir dist",
 		"serve": "node dist/server.js",
-		"pm2": "NODE_ENV='development' PORT=7000 pm2 start src/server.js --interpreter babel-node",
-		"heroku-postbuild": "yarn dev"
+		"pm2": "NODE_ENV='development' PORT=7000 pm2 start src/server.js --interpreter babel-node"
 	},
 	"dependencies": {
 		"apollo-engine": "^1.1.2",
