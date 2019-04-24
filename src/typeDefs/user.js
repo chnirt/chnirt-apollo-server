@@ -1,6 +1,20 @@
 import { gql } from 'apollo-server-express'
 
 export default gql`
+	extend type Query {
+		me: User @auth
+		users: [User!]! @auth
+		user(_id: ID!): User @auth
+	}
+	extend type Mutation {
+		register(userInput: UserInput!): User @guest
+		login(userInput: LoginUserInput!): User @guest
+		logout: Boolean @auth
+		deleteMany: Boolean
+	}
+	extend type Subscription {
+		newUser: User!
+	}
 	type AuthData {
 		userId: ID!
 		token: String!
@@ -11,6 +25,7 @@ export default gql`
 		email: String!
 		password: String!
 		username: String!
+		chats: [Chat!]!
 		firstLetterOfEmail: String!
 		createdAt: String!
 		updatedAt: String!
@@ -23,21 +38,5 @@ export default gql`
 	input LoginUserInput {
 		email: String!
 		password: String!
-	}
-	extend type Query {
-		me: User @auth
-		users: [User] @auth
-		user(_id: ID!): User @auth
-	}
-
-	extend type Mutation {
-		register(userInput: UserInput!): User @guest
-		login(userInput: LoginUserInput!): AuthData @guest
-		logout: Boolean @auth
-		deleteMany: Boolean
-	}
-
-	extend type Subscription {
-		newUser: User!
 	}
 `

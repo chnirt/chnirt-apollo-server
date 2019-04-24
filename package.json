@@ -8,7 +8,8 @@
 		"dev": "NODE_ENV='development' PORT=7000 yarn start",
 		"build": "babel src --out-dir dist",
 		"serve": "node dist/server.js",
-		"pm2": "NODE_ENV='development' PORT=7000 pm2 start src/server.js --interpreter babel-node"
+		"pm2": "NODE_ENV='development' PORT=7000 pm2 start src/server.js --interpreter babel-node",
+		"heroku-postbuild": "yarn && yarn build && yarn serve"
 	},
 	"dependencies": {
 		"apollo-engine": "^1.1.2",
@@ -24,7 +25,6 @@
 		"graphql-voyager": "^1.0.0-rc.26",
 		"http": "^0.0.0",
 		"joi": "^14.3.1",
-		"jsonwebtoken": "^8.5.1",
 		"mongoose": "^5.5.0"
 	},
 	"devDependencies": {

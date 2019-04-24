@@ -1,4 +1,7 @@
 import root from './root'
-import userSchema from './user'
+import user from './user'
 
-export default [root, userSchema]
+import chat from './chat'
+import message from './message'
+
+export default [root, user, chat, message]

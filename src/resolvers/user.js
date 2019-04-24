@@ -1,10 +1,7 @@
-import mongoose from 'mongoose'
-import { User } from '../models'
-import { UserInputError } from 'apollo-server-express'
-import { signUp, signIn } from '../schemas'
+import { User, Chat } from '../models'
+import { signUp, signIn, objectId } from '../schemas'
 import Joi from 'joi'
 import { attemptSignIn, signOut } from '../auth/auth'
-import jwt from 'jsonwebtoken'
 
 export default {
 	Subscription: {
@@ -18,20 +15,16 @@ export default {
 			// DONE:
 			return await User.findById(req.session.userId)
 		},
-		users: async (parent, args, { req }, info) => {
+		users: async (parent, args, context, info) => {
 			// TODO: projection, pagination
 			// DONE:
 			return await User.find()
 		},
-		user: async (parent, { _id }, { req }, info) => {
+		user: async (parent, args, context, info) => {
 			// TODO: auth, projection, sanitization
 			// DONE:
-			if (!mongoose.Types.ObjectId.isValid(_id)) {
-				throw new UserInputError(`${_id} is not a valid user ID.`)
-			}
-			return await User.findById({
-				_id
-			})
+			await Joi.validate(args, objectId, { abortEarly: false })
+			return await User.findById(args._id)
 		}
 	},
 	Mutation: {
@@ -57,22 +50,7 @@ export default {
 			const { userId } = req.session
 
 			if (userId) {
-				const token = await jwt.sign(
-					{
-						iss: 'Chnirt',
-						sub: userId
-					},
-					process.env.SECRET_KEY,
-					{
-						expiresIn: '30d'
-					}
-				)
-
-				return {
-					userId: userId,
-					token: token,
-					tokenExpiration: '30d'
-				}
+				return await User.findById(userId)
 			}
 
 			await Joi.validate(userInput, signIn, { abortEarly: false })
@@ -83,22 +61,7 @@ export default {
 
 			req.session.userId = user._id
 
-			const token = await jwt.sign(
-				{
-					iss: 'Chnirt',
-					sub: user._id
-				},
-				process.env.SECRET_KEY,
-				{
-					expiresIn: '30d'
-				}
-			)
-
-			return {
-				userId: user._id,
-				token: token,
-				tokenExpiration: '30d'
-			}
+			return user
 		},
 		logout: async (parent, args, { req, res }, info) => {
 			// TODO: ensure login
@@ -108,11 +71,16 @@ export default {
 		deleteMany: async () => {
 			// TODO: delete all
 			// DONE:
-			const rsUser = await User.deleteMany()
-			return rsUser ? true : false
+			const delUser = await User.deleteMany()
+			const delChat = await Chat.deleteMany()
+			return delUser && delChat ? true : false
 		}
 	},
 	User: {
-		firstLetterOfEmail: parent => parent.email[0]
+		firstLetterOfEmail: parent => parent.email[0],
+		chats: async (user, args, { req }, info) => {
+			// TODO: should not be able to list other ppl's chats or read their msgs!
+			return (await user.populate('chats').execPopulate()).chats
+		}
 	}
 }

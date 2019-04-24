@@ -1,14 +1,15 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
+import mongoose, { Schema } from 'mongoose'
+import bcrypt from 'bcrypt'
+const { ObjectId } = Schema.Types
 
-const userSchema = new mongoose.Schema(
+const userSchema = new Schema(
 	{
 		email: {
 			type: String,
 			required: true,
 			validate: {
 				validator: email => User.doestntExist({ email }),
-				message: ({ value }) => `Email ${value} has already been taken.`
+				message: () => `Email has already been taken.`
 			}
 		},
 		password: {
@@ -19,10 +20,10 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			required: true
 		},
-		createdEvents: [
+		chats: [
 			{
-				type: mongoose.Schema.Types.ObjectId,
-				ref: 'Event'
+				type: ObjectId,
+				ref: 'Chat'
 			}
 		]
 	},
