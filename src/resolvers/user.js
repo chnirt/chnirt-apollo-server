@@ -1,7 +1,7 @@
 import { User, Chat } from '../models'
 import { signUp, signIn, objectId } from '../schemas'
 import Joi from 'joi'
-import { attemptSignIn, signOut } from '../auth/auth'
+import { tokenTrade, signOut } from '../auth/auth'
 
 export default {
 	Subscription: {
@@ -10,63 +10,55 @@ export default {
 		}
 	},
 	Query: {
-		me: async (parent, args, { req }) => {
+		me: async (parent, args, context, info) => {
 			// TODO: ensure login, projection
 			// DONE:
-			return await User.findById(req.session.userId)
+
+			const { currentUser } = context
+
+			return await currentUser
 		},
 		users: async (parent, args, context, info) => {
 			// TODO: projection, pagination
 			// DONE:
+
 			return await User.find()
 		},
 		user: async (parent, args, context, info) => {
 			// TODO: auth, projection, sanitization
 			// DONE:
+
 			await Joi.validate(args, objectId, { abortEarly: false })
+
 			return await User.findById(args._id)
 		}
 	},
 	Mutation: {
-		register: async (parent, { userInput }, { req, pubsub }, info) => {
+		register: async (parent, { userInput }, { pubsub }, info) => {
 			// TODO: ensure logout, validation
 			// DONE:
 
 			await Joi.validate(userInput, signUp, { abortEarly: false })
 
-			const user = await User.create(userInput)
-
-			req.session.userId = user._id
+			const newUser = await User.create(userInput)
 
 			pubsub.publish('newUser', {
 				newUser: user
 			})
 
-			return user
+			return newUser
 		},
 		login: async (parent, { userInput }, { req }, info) => {
 			// TODO: ensure logout, check session
 			// DONE:
-			const { userId } = req.session
-
-			if (userId) {
-				return await User.findById(userId)
-			}
 
 			await Joi.validate(userInput, signIn, { abortEarly: false })
 
 			const { email, password } = userInput
 
-			const user = await attemptSignIn(email, password)
+			const token = await tokenTrade(email, password)
 
-			req.session.userId = user._id
-
-			return user
-		},
-		logout: async (parent, args, { req, res }, info) => {
-			// TODO: ensure login
-			// DONE:
-			return signOut(req, res)
+			return { token }
 		},
 		deleteMany: async () => {
 			// TODO: delete all

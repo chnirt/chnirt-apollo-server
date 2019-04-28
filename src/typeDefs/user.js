@@ -7,18 +7,15 @@ export default gql`
 		user(_id: ID!): User @auth
 	}
 	extend type Mutation {
-		register(userInput: UserInput!): User @guest
-		login(userInput: LoginUserInput!): User @guest
-		logout: Boolean @auth
+		register(userInput: UserInput!): User
+		login(userInput: LoginUserInput!): AuthData
 		deleteMany: Boolean
 	}
 	extend type Subscription {
 		newUser: User!
 	}
 	type AuthData {
-		userId: ID!
 		token: String!
-		tokenExpiration: String!
 	}
 	type User {
 		_id: ID!

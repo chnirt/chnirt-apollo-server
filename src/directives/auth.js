@@ -1,15 +1,21 @@
 import { SchemaDirectiveVisitor } from 'apollo-server-express'
 import { defaultFieldResolver } from 'graphql'
-import { ensureSignedIn } from '../auth/auth'
+import { verifyToken } from '../auth/auth'
 
 class AuthDirective extends SchemaDirectiveVisitor {
 	visitFieldDefinition(field) {
 		const { resolve = defaultFieldResolver } = field
 
 		field.resolve = function(...args) {
-			const [, , context] = args
+			const { currentUser } = args[2]
 
-			ensureSignedIn(context.req)
+			if (!currentUser) {
+				throw new Error('You are not authenticated!')
+			}
+
+			// if (!user.is_admin) {
+			// 	throw new Error('This is above your pay grade!')
+			// }
 
 			return resolve.apply(this, args)
 		}

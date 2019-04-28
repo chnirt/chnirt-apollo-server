@@ -3,6 +3,9 @@ import { ApolloServer, PubSub } from 'apollo-server-express'
 import express from 'express'
 import session from 'express-session'
 import connectRedis from 'connect-redis'
+import jwt from 'jsonwebtoken'
+import { User } from './models'
+import { verifyToken } from './auth/auth'
 
 import 'dotenv/config'
 
@@ -27,29 +30,29 @@ const app = express()
 // Middleware
 app.disable('x-powered-by')
 
-const RedisStore = connectRedis(session)
+// const RedisStore = connectRedis(session)
 
-const store = new RedisStore({
-	host: process.env.REDIS_HOST,
-	port: process.env.REDIS_PORT,
-	pass: process.env.REDIS_PASSWORD
-})
+// const store = new RedisStore({
+// 	host: process.env.REDIS_HOST,
+// 	port: process.env.REDIS_PORT,
+// 	pass: process.env.REDIS_PASSWORD
+// })
 
-app.use(
-	session({
-		store,
-		name: process.env.SESS_NAME,
-		secret: process.env.SESS_SECRET,
-		resave: true,
-		rolling: true,
-		saveUninitialized: false,
-		cookie: {
-			maxAge: parseInt(process.env.SESS_LIFETIME),
-			sameSite: true,
-			secure: IN_PROD
-		}
-	})
-)
+// app.use(
+// 	session({
+// 		store,
+// 		name: process.env.SESS_NAME,
+// 		secret: process.env.SESS_SECRET,
+// 		resave: true,
+// 		rolling: true,
+// 		saveUninitialized: false,
+// 		cookie: {
+// 			maxAge: parseInt(process.env.SESS_LIFETIME),
+// 			sameSite: true,
+// 			secure: IN_PROD
+// 		}
+// 	})
+// )
 app.use(voyagerPath, voyagerMiddleware({ endpointUrl: path }))
 
 const pubsub = new PubSub()
@@ -59,7 +62,18 @@ const server = new ApolloServer({
 	typeDefs,
 	resolvers,
 	schemaDirectives,
-	context: ({ req, res }) => ({ req, res, pubsub }),
+	context: async ({ req, res }) => {
+		let currentUser = ''
+
+		const auth = req.headers && req.headers.authorization
+
+		if (auth) {
+			currentUser = await verifyToken(req)
+		}
+
+		// add the user to the context
+		return { req, res, pubsub, currentUser }
+	},
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {
 			console.log('🔗 Connected to websocket')
@@ -109,16 +123,21 @@ const server = new ApolloServer({
 // 	apiKey: process.env.ENGINE_API_KEY
 // });
 
-//Mount a jwt or other authentication middleware that is run before the GraphQL execution
-// app.use(path, jwtCheck);
+// enable cors
+var corsOptions = {
+	origin: 'http://localhost:3000',
+	credentials: true // <-- REQUIRED backend setting
+}
 
 server.applyMiddleware({
 	app,
 	path,
-	cors: { credentials: true, origin: 'http://localhost:3000' }
+	cors: corsOptions
 }) // app is from an existing express app
 
 const httpServer = http.createServer(app)
+
+// Add subscription support
 server.installSubscriptionHandlers(httpServer)
 
 httpServer.listen(PORT, () => {

@@ -11,4 +11,6 @@ mongoose.connect(url, {
 	useCreateIndex: true
 })
 
-mongoose.connection.once('open', () => console.log(`☁️ Database connected`))
+mongoose.connection.once('open', () => {
+	console.log(`☁️ Database connected`)
+})
