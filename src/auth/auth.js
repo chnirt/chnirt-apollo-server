@@ -40,20 +40,3 @@ export const verifyToken = async req => {
 	// add the user to the context
 	return currentUser
 }
-
-export const ensureSignedIn = req => {
-	if (!verifyToken(req)) {
-		throw new AuthenticationError('Token is invalid.')
-	}
-}
-
-// export const signOut = (req, res) =>
-// 	new Promise((resolve, reject) => {
-// 		req.session.destroy(err => {
-// 			if (err) reject(err)
-
-// 			res.clearCookie(process.env.SESS_NAME)
-
-// 			resolve(true)
-// 		})
-// 	})

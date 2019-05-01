@@ -8,13 +8,13 @@ export default gql`
 	}
 	extend type Mutation {
 		register(userInput: UserInput!): User
-		login(userInput: LoginUserInput!): AuthData
+		login(userInput: LoginUserInput!): Token
 		deleteMany: Boolean
 	}
 	extend type Subscription {
 		newUser: User!
 	}
-	type AuthData {
+	type Token {
 		token: String!
 	}
 	type User {
