@@ -43,10 +43,10 @@ export default {
 			const newUser = await User.create(userInput)
 
 			pubsub.publish('newUser', {
-				newUser: user
+				newUser: newUser
 			})
 
-			return newUser
+			return true
 		},
 		login: async (parent, { userInput }, { req }, info) => {
 			// TODO: ensure logout, check session

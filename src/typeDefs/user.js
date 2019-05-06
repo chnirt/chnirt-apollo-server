@@ -7,7 +7,7 @@ export default gql`
 		user(_id: ID!): User @auth
 	}
 	extend type Mutation {
-		register(userInput: UserInput!): User
+		register(userInput: UserInput!): Boolean
 		login(userInput: LoginUserInput!): Token
 		deleteMany: Boolean
 	}

@@ -1,34 +1,33 @@
 Arguments: 
-  /usr/local/Cellar/node/11.13.0/bin/node /usr/local/Cellar/yarn/1.12.1/libexec/bin/yarn.js add express-ssion
+  /Users/trinhchin/.nvm/versions/node/v12.1.0/bin/node /usr/local/Cellar/yarn/1.15.2/libexec/bin/yarn.js dev
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands
+  /Users/trinhchin/.nvm/versions/node/v12.1.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Users/trinhchin/.nvm/versions/node/v12.1.0/bin
 
 Yarn version: 
-  1.12.1
+  1.15.2
 
 Node version: 
-  11.13.0
+  12.1.0
 
 Platform: 
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/express-ssion: Not found
-      at Request.params.callback [as _callback] (/usr/local/Cellar/yarn/1.12.1/libexec/lib/cli.js:63139:18)
-      at Request.self.callback (/usr/local/Cellar/yarn/1.12.1/libexec/lib/cli.js:124547:22)
-      at Request.emit (events.js:193:13)
-      at Request.<anonymous> (/usr/local/Cellar/yarn/1.12.1/libexec/lib/cli.js:125519:10)
-      at Request.emit (events.js:193:13)
-      at IncomingMessage.<anonymous> (/usr/local/Cellar/yarn/1.12.1/libexec/lib/cli.js:125441:12)
-      at Object.onceWrapper (events.js:281:20)
-      at IncomingMessage.emit (events.js:198:15)
-      at endReadableNT (_stream_readable.js:1142:12)
-      at processTicksAndRejections (internal/process/task_queues.js:81:17)
+  SyntaxError: /Users/trinhchin/Desktop/apollo-server/package.json: Unexpected token / in JSON at position 44
+      at JSON.parse (<anonymous>)
+      at /usr/local/Cellar/yarn/1.15.2/libexec/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/Cellar/yarn/1.15.2/libexec/lib/cli.js:304:30)
+      at /usr/local/Cellar/yarn/1.15.2/libexec/lib/cli.js:315:13
 
 npm manifest: 
   {
-  	"name": "Backend",
+  	"name": "apollo-server",
+  	"engines": {
+  		// "node": "11.14.0",
+  		"npm": "6.9.0"
+  	},
   	"version": "1.0.0",
   	"main": "index.js",
   	"license": "MIT",
@@ -37,19 +36,18 @@ npm manifest:
   		"dev": "NODE_ENV='development' PORT=7000 yarn start",
   		"build": "babel src --out-dir dist",
   		"serve": "node dist/server.js",
-  		"pm2": "pm2 start src/server.js"
+  		"pm2": "NODE_ENV='development' PORT=7000 pm2 start src/server.js --interpreter babel-node"
   	},
   	"dependencies": {
-  		"@babel/runtime": "^7.4.3",
   		"apollo-engine": "^1.1.2",
   		"apollo-server": "^2.4.8",
   		"apollo-server-cache-memcached": "^0.3.1",
   		"apollo-server-express": "^2.4.8",
   		"bcrypt": "^3.0.5",
-  		"cors": "^2.8.5",
+  		"connect-redis": "^3.4.1",
   		"dotenv": "^7.0.0",
-  		"esm": "^3.2.22",
   		"express": "^4.16.4",
+  		"express-session": "^1.16.1",
   		"graphql": "^14.2.1",
   		"graphql-voyager": "^1.0.0-rc.26",
   		"http": "^0.0.0",
@@ -759,7 +757,7 @@ Lockfile:
       pirates "^4.0.0"
       source-map-support "^0.5.9"
   
-  "@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.2.0", "@babel/runtime@^7.4.3":
+  "@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.2.0":
     version "7.4.3"
     resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.3.tgz#79888e452034223ad9609187a0ad1fe0d2ad4bdc"
     integrity sha512-9lsJwJLxDh/T3Q3SZszfWOTkk3pHbkmH+3KY+zwIDmsNlxsumuhS2TH3NIpktU4kNvfzy+k3eLT7aTJSPTo0OA==
@@ -2533,6 +2531,14 @@ Lockfile:
       write-file-atomic "^2.0.0"
       xdg-basedir "^3.0.0"
   
+  connect-redis@^3.4.1:
+    version "3.4.1"
+    resolved "https://registry.yarnpkg.com/connect-redis/-/connect-redis-3.4.1.tgz#0623af46182232457fefbc7d4f552d87d35b3d20"
+    integrity sha512-oXNcpLg/PJ6G4gbhyGwrQK9mUQTKYa2aEnOH9kWIxbNUjIFPqUmzz75RdLp5JTPSjrBVcz+9ll4sSxfvlW0ZLA==
+    dependencies:
+      debug "^4.1.1"
+      redis "^2.8.0"
+  
   connection-parse@0.0.x:
     version "0.0.7"
     resolved "https://registry.yarnpkg.com/connection-parse/-/connection-parse-0.0.7.tgz#18e7318aab06a699267372b10c5226d25a1c9a69"
@@ -2631,7 +2637,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
     integrity sha1-tf1UIgqivFq1eqtxQMlAdUUDwac=
   
-  cors@^2.8.4, cors@^2.8.5:
+  cors@^2.8.4:
     version "2.8.5"
     resolved "https://registry.yarnpkg.com/cors/-/cors-2.8.5.tgz#eac11da51592dd86b9f06f6e7ac293b3df875d29"
     integrity sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==
@@ -2830,6 +2836,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
     integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
   
+  depd@~2.0.0:
+    version "2.0.0"
+    resolved "https://registry.yarnpkg.com/depd/-/depd-2.0.0.tgz#b696163cc757560d09cf22cc8fad1571b79e76df"
+    integrity sha512-g7nH6P6dyDioJogAAGprGpCtVImJhpPk/roCzdb3fIh61/s/nPsfR6onyMwkCAR/OlC3yBC0lESvUoQEAssIrw==
+  
   deprecated-decorator@^0.1.6:
     version "0.1.6"
     resolved "https://registry.yarnpkg.com/deprecated-decorator/-/deprecated-decorator-0.1.6.tgz#00966317b7a12fe92f3cc831f7583af329b86c37"
@@ -2882,6 +2893,11 @@ Lockfile:
     version "7.0.0"
     resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-7.0.0.tgz#a2be3cd52736673206e8a85fb5210eea29628e7c"
     integrity sha512-M3NhsLbV1i6HuGzBUH8vXrtxOk+tWmzWKDMbAVSUp3Zsjm7ywFeuwrUXhmhQyRK1q5B5GGy7hcXPbj3bnfZg2g==
+  
+  double-ended-queue@^2.1.0-0:
+    version "2.1.0-0"
+    resolved "https://registry.yarnpkg.com/double-ended-queue/-/double-ended-queue-2.1.0-0.tgz#103d3527fd31528f40188130c841efdd78264e5c"
+    integrity sha1-ED01J/0xUo9AGIEwyEHv3XgmTlw=
   
   duplexer3@^0.1.4:
     version "0.1.4"
@@ -3021,11 +3037,6 @@ Lockfile:
     optionalDependencies:
       source-map "~0.6.1"
   
-  esm@^3.2.22:
-    version "3.2.22"
-    resolved "https://registry.yarnpkg.com/esm/-/esm-3.2.22.tgz#5062c2e22fee3ccfee4e8f20da768330da90d6e3"
-    integrity sha512-z8YG7U44L82j1XrdEJcqZOLUnjxco8pO453gKOlaMD1/md1n/5QrscAmYG+oKUspsmDLuBFZrpbxI6aQ67yRxA==
-  
   esprima@3.x.x, esprima@^3.1.3:
     version "3.1.3"
     resolved "https://registry.yarnpkg.com/esprima/-/esprima-3.1.3.tgz#fdca51cee6133895e3c88d535ce49dbff62a4633"
@@ -3127,6 +3138,20 @@ Lockfile:
       regex-not "^1.0.0"
       snapdragon "^0.8.1"
       to-regex "^3.0.1"
+  
+  express-session@^1.16.1:
+    version "1.16.1"
+    resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.16.1.tgz#251ff9776c59382301de6c8c33411af357ed439c"
+    integrity sha512-pWvUL8Tl5jUy1MLH7DhgUlpoKeVPUTe+y6WQD9YhcN0C5qAhsh4a8feVjiUXo3TFhIy191YGZ4tewW9edbl2xQ==
+    dependencies:
+      cookie "0.3.1"
+      cookie-signature "1.0.6"
+      debug "2.6.9"
+      depd "~2.0.0"
+      on-headers "~1.0.2"
+      parseurl "~1.3.2"
+      safe-buffer "5.1.2"
+      uid-safe "~2.1.5"
   
   express@^4.0.0, express@^4.16.4:
     version "4.16.4"
@@ -5237,6 +5262,11 @@ Lockfile:
     dependencies:
       ee-first "1.1.1"
   
+  on-headers@~1.0.2:
+    version "1.0.2"
+    resolved "https://registry.yarnpkg.com/on-headers/-/on-headers-1.0.2.tgz#772b0ae6aaa525c399e489adfad90c403eb3c28f"
+    integrity sha512-pZAE+FJLoyITytdqK0U5s+FIpjN0JP3OzFi/u8Rx+EV5/W+JTWGXG8xFzevE7AjBfDqHv/8vL8qQsIhHnqRkrA==
+  
   once@^1.3.0, once@^1.3.1, once@^1.4.0:
     version "1.4.0"
     resolved "https://registry.yarnpkg.com/once/-/once-1.4.0.tgz#583b1aa775961d4b113ac17d9c50baef9dd76bd1"
@@ -5723,6 +5753,11 @@ Lockfile:
       object-assign "^4.1.0"
       strict-uri-encode "^1.0.0"
   
+  random-bytes@~1.0.0:
+    version "1.0.0"
+    resolved "https://registry.yarnpkg.com/random-bytes/-/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
+    integrity sha1-T2ih3Arli9P7lYSMMDJNt11kNgs=
+  
   range-parser@~1.2.0:
     version "1.2.0"
     resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
@@ -5880,6 +5915,25 @@ Lockfile:
     integrity sha1-iYS1gV2ZyyIEacme7v/jiRPmzAs=
     dependencies:
       esprima "~4.0.0"
+  
+  redis-commands@^1.2.0:
+    version "1.4.0"
+    resolved "https://registry.yarnpkg.com/redis-commands/-/redis-commands-1.4.0.tgz#52f9cf99153efcce56a8f86af986bd04e988602f"
+    integrity sha512-cu8EF+MtkwI4DLIT0x9P8qNTLFhQD4jLfxLR0cCNkeGzs87FN6879JOJwNQR/1zD7aSYNbU0hgsV9zGY71Itvw==
+  
+  redis-parser@^2.6.0:
+    version "2.6.0"
+    resolved "https://registry.yarnpkg.com/redis-parser/-/redis-parser-2.6.0.tgz#52ed09dacac108f1a631c07e9b69941e7a19504b"
+    integrity sha1-Uu0J2srBCPGmMcB+m2mUHnoZUEs=
+  
+  redis@^2.8.0:
+    version "2.8.0"
+    resolved "https://registry.yarnpkg.com/redis/-/redis-2.8.0.tgz#202288e3f58c49f6079d97af7a10e1303ae14b02"
+    integrity sha512-M1OkonEQwtRmZv4tEWF2VgpG0JWJ8Fv1PhlgT5+B+uNq2cA3Rt1Yt/ryoR+vQNOQcIEgdCdfH0jr3bDpihAw1A==
+    dependencies:
+      double-ended-queue "^2.1.0-0"
+      redis-commands "^1.2.0"
+      redis-parser "^2.6.0"
   
   redux@^4.0.0:
     version "4.0.1"
@@ -6750,6 +6804,13 @@ Lockfile:
     version "0.7.19"
     resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.19.tgz#94151be4c0a7fb1d001af7022fdaca4642659e4b"
     integrity sha512-T3PVJ6uz8i0HzPxOF9SWzWAlfN/DavlpQqepn22xgve/5QecC+XMCAtmUNnY7C9StehaV6exjUCI801lOI7QlQ==
+  
+  uid-safe@~2.1.5:
+    version "2.1.5"
+    resolved "https://registry.yarnpkg.com/uid-safe/-/uid-safe-2.1.5.tgz#2b3d5c7240e8fc2e58f8aa269e5ee49c0857bd3a"
+    integrity sha512-KPHm4VL5dDXKz01UuEd88Df+KzynaohSL9fBh096KWAxSKZQDI2uBrVqtvRM4rwrIrRRKsdLNML/lnaaVSRioA==
+    dependencies:
+      random-bytes "~1.0.0"
   
   ultron@~1.1.0:
     version "1.1.1"
