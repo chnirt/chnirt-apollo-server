@@ -63,10 +63,10 @@ const server = new ApolloServer({
 	context: async ({ req, res }) => {
 		let currentUser = ''
 
-		const auth = (req.headers && req.headers.authorization) || null
+		const authToken = req.headers.authorization
 
-		if (auth) {
-			currentUser = await verifyToken(req)
+		if (authToken) {
+			currentUser = await verifyToken(authToken)
 		}
 
 		// add the user to the context

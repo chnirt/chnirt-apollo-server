@@ -24,9 +24,9 @@ export const tokenTrade = async (email, password) => {
 	return token
 }
 
-export const verifyToken = async req => {
+export const verifyToken = async authToken => {
 	// get the user token from the headers
-	const token = req.headers.authorization.split(' ')[1]
+	const token = authToken.split(' ')[1]
 
 	// try to retrieve a user with the token
 	const decodeToken = await jwt.verify(token, process.env.SECRET_KEY)
