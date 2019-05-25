@@ -1,6 +1,5 @@
 import mongoose, { Schema } from 'mongoose'
 import bcrypt from 'bcrypt'
-const { ObjectId } = Schema.Types
 
 const userSchema = new Schema(
 	{
@@ -20,9 +19,15 @@ const userSchema = new Schema(
 			type: String,
 			required: true
 		},
+		dainties: [
+			{
+				type: Schema.Types.ObjectId,
+				ref: 'Dainty'
+			}
+		],
 		chats: [
 			{
-				type: ObjectId,
+				type: Schema.Types.ObjectId,
 				ref: 'Chat'
 			}
 		]

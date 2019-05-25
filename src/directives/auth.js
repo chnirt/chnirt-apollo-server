@@ -1,6 +1,5 @@
 import { SchemaDirectiveVisitor } from 'apollo-server-express'
 import { defaultFieldResolver } from 'graphql'
-import { verifyToken } from '../auth/auth'
 
 class AuthDirective extends SchemaDirectiveVisitor {
 	visitFieldDefinition(field) {
@@ -13,7 +12,7 @@ class AuthDirective extends SchemaDirectiveVisitor {
 				throw new Error('You are not authenticated!')
 			}
 
-			// if (!user.is_admin) {
+			// if (!currentUser.is_admin) {
 			// 	throw new Error('This is above your pay grade!')
 			// }
 

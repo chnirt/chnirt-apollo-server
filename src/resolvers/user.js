@@ -1,4 +1,4 @@
-import { User, Chat } from '../models'
+import { User, Chat, Dainty } from '../models'
 import { signUp, signIn, objectId } from '../schemas'
 import Joi from 'joi'
 import { tokenTrade, signOut } from '../auth/auth'
@@ -10,7 +10,7 @@ export default {
 		}
 	},
 	Query: {
-		me: async (parent, args, context, info) => {
+		me: async (root, args, context, info) => {
 			// TODO: ensure login, projection
 			// DONE:
 
@@ -18,13 +18,13 @@ export default {
 
 			return await currentUser
 		},
-		users: async (parent, args, context, info) => {
+		users: async (root, args, context, info) => {
 			// TODO: projection, pagination
 			// DONE:
 
 			return await User.find()
 		},
-		user: async (parent, args, context, info) => {
+		user: async (root, args, context, info) => {
 			// TODO: auth, projection, sanitization
 			// DONE:
 
@@ -34,7 +34,7 @@ export default {
 		}
 	},
 	Mutation: {
-		register: async (parent, { userInput }, { pubsub }, info) => {
+		register: async (root, { userInput }, { pubsub }, info) => {
 			// TODO: ensure logout, validation
 			// DONE:
 
@@ -48,7 +48,7 @@ export default {
 
 			return true
 		},
-		login: async (parent, { userInput }, { req }, info) => {
+		login: async (root, { userInput }, { req }, info) => {
 			// TODO: ensure logout, check session
 			// DONE:
 
@@ -65,11 +65,12 @@ export default {
 			// DONE:
 			const delUser = await User.deleteMany()
 			const delChat = await Chat.deleteMany()
-			return delUser && delChat ? true : false
+			const delDainty = await Dainty.deleteMany()
+			return delUser && delChat && delDainty ? true : false
 		}
 	},
 	User: {
-		firstLetterOfEmail: parent => parent.email[0],
+		firstLetterOfEmail: root => root.email[0],
 		chats: async (user, args, { req }, info) => {
 			// TODO: should not be able to list other ppl's chats or read their msgs!
 			return (await user.populate('chats').execPopulate()).chats

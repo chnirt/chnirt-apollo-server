@@ -22,6 +22,7 @@ export default gql`
 		email: String!
 		password: String!
 		username: String!
+		dainties: [Dainty!]!
 		chats: [Chat!]!
 		firstLetterOfEmail: String!
 		createdAt: String!
