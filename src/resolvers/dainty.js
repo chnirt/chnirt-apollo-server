@@ -1,5 +1,5 @@
 import { Dainty } from '../models'
-import { createDainty } from '../schemas'
+import { createDainty, objectId } from '../schemas'
 import Joi from 'joi'
 import { User } from '../models'
 
@@ -10,6 +10,9 @@ export default {
 			// DONE:
 
 			return await Dainty.find()
+		},
+		dainty: async (root, args, context, info) => {
+			return await Dainty.findById(args._id)
 		}
 	},
 	Mutation: {
@@ -31,6 +34,32 @@ export default {
 					$push: { dainties: newDainty }
 				}
 			)
+
+			return true
+		},
+		updateDainty: async (root, { _id, daintyInput }, context, info) => {
+			// TODO: ensure login, validation
+			// DONE:
+			await Joi.validate({ _id }, objectId, { abortEarly: false })
+
+			await Joi.validate(daintyInput, createDainty, {
+				abortEarly: false
+			})
+
+			await Dainty.findOneAndUpdate({ _id }, daintyInput, { new: true })
+
+			return true
+		},
+		deleteDainty: async (root, args, context, info) => {
+			// TODO: ensure login, validation
+			// DONE:
+			await Joi.validate(args, objectId, {
+				abortEarly: false
+			})
+
+			await Dainty.findOneAndRemove({
+				_id: args._id
+			})
 
 			return true
 		}

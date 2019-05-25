@@ -74,6 +74,9 @@ export default {
 		chats: async (user, args, { req }, info) => {
 			// TODO: should not be able to list other ppl's chats or read their msgs!
 			return (await user.populate('chats').execPopulate()).chats
+		},
+		dainties: async (user, args, { req }, info) => {
+			return (await user.populate('dainties').execPopulate()).dainties
 		}
 	}
 }

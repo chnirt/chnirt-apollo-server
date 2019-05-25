@@ -12,7 +12,7 @@ export const tokenTrade = async (email, password) => {
 
 	const token = jwt.sign(
 		{
-			iss: 'Chnirthgram',
+			iss: 'chnirt',
 			sub: user._id
 		},
 		process.env.SECRET_KEY,
