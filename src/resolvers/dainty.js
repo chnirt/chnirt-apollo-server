@@ -35,7 +35,7 @@ export default {
 				}
 			)
 
-			return true
+			return newDainty
 		},
 		updateDainty: async (root, { _id, daintyInput }, context, info) => {
 			// TODO: ensure login, validation

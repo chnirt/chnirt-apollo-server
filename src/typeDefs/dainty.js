@@ -6,7 +6,7 @@ export default gql`
 		dainty(_id: ID!): Dainty! @auth
 	}
 	extend type Mutation {
-		createDainty(daintyInput: DaintyInput!): Boolean @auth
+		createDainty(daintyInput: DaintyInput!): Dainty! @auth
 		updateDainty(_id: ID!, daintyInput: DaintyInput!): Boolean @auth
 		deleteDainty(_id: ID!): Boolean @auth
 	}

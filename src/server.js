@@ -1,8 +1,8 @@
 import http from 'http'
 import { ApolloServer, PubSub } from 'apollo-server-express'
 import express from 'express'
-import session from 'express-session'
-import connectRedis from 'connect-redis'
+// import session from 'express-session'
+// import connectRedis from 'connect-redis'
 import { verifyToken } from './auth/auth'
 
 import 'dotenv/config'
