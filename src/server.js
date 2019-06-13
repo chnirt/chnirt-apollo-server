@@ -3,7 +3,7 @@ import { ApolloServer, PubSub } from 'apollo-server-express'
 import express from 'express'
 // import session from 'express-session'
 // import connectRedis from 'connect-redis'
-import { verifyToken } from './auth/auth'
+import { verifyTokens } from './auth/auth'
 
 import 'dotenv/config'
 
@@ -63,14 +63,19 @@ const server = new ApolloServer({
 	context: async ({ req, res }) => {
 		let currentUser = ''
 
-		const authToken = req.headers.authorization
+		const { token, refreshtoken } = req.headers
 
-		if (authToken) {
-			currentUser = await verifyToken(authToken)
+		if (token && refreshtoken) {
+			currentUser = await verifyTokens(token, refreshtoken)
 		}
 
 		// add the user to the context
-		return { req, res, pubsub, currentUser }
+		return {
+			req,
+			res,
+			pubsub,
+			currentUser
+		}
 	},
 	subscriptions: {
 		onConnect: (connectionParams, webSocket, context) => {

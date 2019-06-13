@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  SyntaxError: /Users/trinhchin/Desktop/apollo-server/package.json: Unexpected token / in JSON at position 44
+  SyntaxError: /Users/trinhchin/Desktop/chnirt-apollo-server/package.json: Unexpected token / in JSON at position 44
       at JSON.parse (<anonymous>)
       at /usr/local/Cellar/yarn/1.15.2/libexec/lib/cli.js:1625:59
       at Generator.next (<anonymous>)

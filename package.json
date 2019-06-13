@@ -1,9 +1,5 @@
 {
 	"name": "apollo-server",
-	"engines": {
-		"node": "11.14.0",
-		"npm": "6.9.0"
-	},
 	"version": "1.0.0",
 	"main": "index.js",
 	"license": "MIT",

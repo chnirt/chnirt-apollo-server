@@ -9,6 +9,7 @@ export default gql`
 	extend type Mutation {
 		register(userInput: UserInput!): Boolean
 		login(userInput: LoginUserInput!): Token
+		refreshTokens(token: String!, refreshToken: String!): Token @auth
 		deleteMany: Boolean
 	}
 	extend type Subscription {
@@ -16,6 +17,7 @@ export default gql`
 	}
 	type Token {
 		token: String!
+		refreshToken: String!
 	}
 	type User {
 		_id: ID!

@@ -1,7 +1,7 @@
 import { User, Chat, Dainty } from '../models'
 import { signUp, signIn, objectId } from '../schemas'
 import Joi from 'joi'
-import { tokenTrade, signOut } from '../auth/auth'
+import { tradeTokens, refreshTokens, signOut } from '../auth/auth'
 
 export default {
 	Subscription: {
@@ -56,9 +56,12 @@ export default {
 
 			const { email, password } = userInput
 
-			const token = await tokenTrade(email, password)
+			const { token, refreshToken } = await tradeTokens(email, password)
 
-			return { token }
+			return { token, refreshToken }
+		},
+		refreshTokens: async (root, { token, refreshToken }, context, info) => {
+			return await refreshTokens(token, refreshToken)
 		},
 		deleteMany: async () => {
 			// TODO: delete all
