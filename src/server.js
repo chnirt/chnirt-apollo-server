@@ -63,10 +63,10 @@ const server = new ApolloServer({
 	context: async ({ req, res }) => {
 		let currentUser = ''
 
-		const { token, refreshtoken } = req.headers
+		const { token } = req.headers
 
-		if (token && refreshtoken) {
-			currentUser = await verifyTokens(token, refreshtoken)
+		if (token) {
+			currentUser = await verifyTokens(token)
 		}
 
 		// add the user to the context

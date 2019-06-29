@@ -10,22 +10,11 @@ export const generateToken = async user => {
 		},
 		process.env.SECRET_KEY,
 		{
-			expiresIn: '15s'
+			expiresIn: '30d'
 		}
 	)
 
-	const refreshToken = await jwt.sign(
-		{
-			iss: 'chnirt',
-			sub: user._id
-		},
-		process.env.SECRET_KEY,
-		{
-			expiresIn: '30s'
-		}
-	)
-
-	return { token, refreshToken }
+	return { token }
 }
 
 export const tradeTokens = async (email, password) => {
@@ -39,24 +28,7 @@ export const tradeTokens = async (email, password) => {
 	return await generateToken(user)
 }
 
-export const refreshTokens = async refreshToken => {
-	let userId = -1
-	try {
-		const decodeRefreshToken = await jwt.verify(
-			refreshToken,
-			process.env.SECRET_KEY
-		)
-		userId = decodeRefreshToken.sub
-	} catch (err) {
-		return {}
-	}
-
-	const user = await User.findOne({ _id: userId })
-
-	return await generateToken(user)
-}
-
-export const verifyTokens = async (token, refreshtoken) => {
+export const verifyTokens = async token => {
 	let currentUser
 	try {
 		// try to retrieve a user with the token
@@ -70,17 +42,7 @@ export const verifyTokens = async (token, refreshtoken) => {
 		// we could also check user roles/permissions here
 		if (!currentUser) throw new AuthorizationError('You must be logged in')
 	} catch (error) {
-		// try to retrieve a user with the refreshtoken
-		const decodeRefreshToken = await jwt.verify(
-			refreshtoken,
-			process.env.SECRET_KEY
-		)
-
-		currentUser = await User.findOne({ _id: decodeRefreshToken.sub })
-
-		const { token, refreshToken } = await refreshTokens(refreshtoken)
-		// console.log('TCL: verifyTokens -> refreshToken', refreshToken)
-		// console.log('TCL: verifyTokens -> token, refreshToken', token)
+		throw new AuthenticationError('Your token is invalid.')
 	}
 
 	// add the user to the context
